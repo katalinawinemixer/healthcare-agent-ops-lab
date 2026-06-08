@@ -48,9 +48,15 @@ the rows check whether the response uses audited sources, avoids unsupported
 certainty, names data-access boundaries, minimizes sensitive data, and includes
 handoff paths for higher-risk workflows.
 
-## Open Locally
+## Run Locally
 
-Open `index.html` in a browser.
+Clone the repo and open the static app from the project folder:
+
+```bash
+git clone https://github.com/katalinawinemixer/healthcare-agent-ops-lab.git
+cd healthcare-agent-ops-lab
+open index.html
+```
 
 This prototype has no build step and uses no external dependencies. It is meant
 to be portable into a larger React/Vite repo later if needed.
