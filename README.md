@@ -1,13 +1,15 @@
 # Healthcare Agent Ops Lab
 
-A standalone portfolio prototype for reviewing healthcare AI agent behavior
-across sensitive payer, provider, billing, authorization, patient-access, and
-clinical-trial workflows.
+Healthcare Agent Ops Lab is a small review workspace for testing synthetic
+healthcare agent responses before they are approved.
 
-The project is designed as a hiring artifact for healthcare AI agent, product
-ops, implementation, and agent-development roles. It shows how I think about
-source grounding, PHI minimization, escalation, human review, and evals before an
-agent is trusted in a regulated workflow.
+I built it around a reviewer workflow: compare an agent response against source
+evidence, tag failure modes, score behavior across safety and usefulness
+criteria, and block approval when a response crosses a risk boundary.
+
+The project explores a practical question: how do you make healthcare agent risk
+visible enough for a human reviewer to catch problems before the response reaches
+a patient, member, or operations team?
 
 ## Live Demo
 
@@ -21,20 +23,30 @@ https://katalinawinemixer.github.io/healthcare-agent-ops-lab/
 
 ![Healthcare Agent Ops Lab eval matrix](docs/assets/screenshots/eval-matrix.png)
 
-## What It Demonstrates
+## Review Workflow
 
-- Agent behavior review with source-grounded transcript examples.
-- Human QA decisions: approve, revise, or escalate.
-- Rubric scoring across accuracy, grounding, empathy, privacy, and workflow
+The lab uses synthetic cases across benefits, billing, patient access, prior
+authorization, and clinical-trial navigation. Each case includes a user request,
+agent response, source references, expected behavior, and review risks.
+
+The reviewer can:
+
+- Inspect the transcript and the evidence ledger behind each source reference.
+- Score the response for accuracy, grounding, empathy, privacy, and workflow
   completion.
-- Failure-mode tagging for ungrounded claims, privacy risk, empathy gaps,
+- Tag failure modes such as ungrounded claims, privacy risk, empathy gaps,
   workflow misses, and missing handoffs.
-- A scenario-driven eval matrix for realistic healthcare scenarios, with row
-  scores computed from explicit assertions against the synthetic agent output.
-- A visible evidence ledger for every source referenced in the transcript.
-- A build playbook that maps discovery, design, evaluation, and operations.
-- Local review persistence with `localStorage`.
-- Exportable JSON review records.
+- Decide whether to approve, revise, or escalate the response.
+- Save notes and review state locally in the browser.
+- Export a JSON review record.
+
+## Evals
+
+The eval matrix turns each scenario into explicit assertions against the
+synthetic agent output. Instead of treating every scenario as a pass/fail demo,
+the rows check whether the response uses audited sources, avoids unsupported
+certainty, names data-access boundaries, minimizes sensitive data, and includes
+handoff paths for higher-risk workflows.
 
 ## Open Locally
 
@@ -67,13 +79,14 @@ without losing the current review state.
 
 Read the project write-up: [docs/case-study.md](docs/case-study.md).
 
-## Adversarial Review
+## What I Would Build Next
 
-This project was reviewed with adversarial sub-agents during development. The
-first pass found unsafe approval, declarative evals, weak source auditability,
-non-persistent review state, mobile ordering issues, search empty-state issues,
-and incomplete tab semantics. Those issues were fixed, tested, and re-reviewed.
-The final adversarial verification found no P0/P1 blockers.
+- Move scenario fixtures into structured JSON and run evals from a backend.
+- Add reviewer accounts and immutable audit history.
+- Track source freshness, owner, and policy status in the evidence ledger.
+- Add adversarial cases for prompt injection, pasted PHI, and conflicting source
+  documents.
+- Support exports for product, implementation, and customer-success review.
 
 ## Data Boundary
 
