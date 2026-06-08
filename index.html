@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Healthcare Agent Ops Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Case library">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">HA</div>
+          <div>
+            <p class="eyebrow">Portfolio Lab</p>
+            <h1>Healthcare Agent Ops Lab</h1>
+          </div>
+        </div>
+
+        <div class="search-row">
+          <label class="sr-only" for="case-search">Search cases</label>
+          <input id="case-search" type="search" placeholder="Search workflows" />
+        </div>
+
+        <nav class="case-list" id="case-list" aria-label="Synthetic healthcare scenarios"></nav>
+
+        <section class="side-panel">
+          <p class="panel-title">Scope</p>
+          <p>
+            Synthetic payer/provider scenarios for agent behavior review, grounding,
+            escalation, empathy, and operational risk. No real PHI.
+          </p>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Agent Development Lifecycle</p>
+            <h2 id="case-title">Loading case</h2>
+            <p id="case-summary" class="summary-text"></p>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="export-button" type="button" title="Export review">
+              <span aria-hidden="true">↓</span>
+              <span class="sr-only">Export review</span>
+            </button>
+            <button class="primary-button" id="reset-button" type="button">Reset Review</button>
+          </div>
+        </header>
+
+        <section class="metric-strip" aria-label="Case metrics">
+          <article>
+            <span class="metric-label">Eval Score</span>
+            <strong id="metric-score">--</strong>
+            <span id="metric-score-note">Weighted rubric</span>
+          </article>
+          <article>
+            <span class="metric-label">Risk Level</span>
+            <strong id="metric-risk">--</strong>
+            <span id="metric-risk-note">Based on failure modes</span>
+          </article>
+          <article>
+            <span class="metric-label">Escalation</span>
+            <strong id="metric-escalation">--</strong>
+            <span>Human handoff policy</span>
+          </article>
+          <article>
+            <span class="metric-label">Source Coverage</span>
+            <strong id="metric-sources">--</strong>
+            <span>Answer-grounding evidence</span>
+          </article>
+        </section>
+
+        <div class="tabbar" role="tablist" aria-label="Workspace views">
+          <button class="tab active" id="review-tab" role="tab" aria-selected="true" aria-controls="review-view" data-tab="review">Review</button>
+          <button class="tab" id="evals-tab" role="tab" aria-selected="false" aria-controls="evals-view" data-tab="evals" tabindex="-1">Eval Matrix</button>
+          <button class="tab" id="playbook-tab" role="tab" aria-selected="false" aria-controls="playbook-view" data-tab="playbook" tabindex="-1">Build Playbook</button>
+        </div>
+
+        <section class="view active" id="review-view" role="tabpanel" aria-labelledby="review-tab">
+          <div class="review-grid">
+            <section class="surface">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Synthetic Transcript</p>
+                  <h3>Agent behavior under review</h3>
+                </div>
+                <span id="case-domain" class="status-pill"></span>
+              </div>
+              <div class="transcript" id="transcript"></div>
+              <div class="evidence-ledger">
+                <div class="section-heading compact">
+                  <div>
+                    <p class="eyebrow">Evidence Ledger</p>
+                    <h3>Auditable source records</h3>
+                  </div>
+                </div>
+                <div id="evidence-list"></div>
+              </div>
+            </section>
+
+            <section class="surface reviewer-panel">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Human QA</p>
+                  <h3>Review decision</h3>
+                </div>
+              </div>
+
+              <div class="decision-control" role="group" aria-label="Review decision">
+                <button type="button" data-decision="approve">Approve</button>
+                <button type="button" data-decision="revise">Revise</button>
+                <button type="button" data-decision="escalate">Escalate</button>
+              </div>
+
+              <div class="rubric" id="rubric"></div>
+
+              <fieldset class="failure-tags">
+                <legend>Failure modes</legend>
+                <label><input type="checkbox" value="ungrounded" /> Ungrounded claim</label>
+                <label><input type="checkbox" value="privacy" /> PHI/privacy concern</label>
+                <label><input type="checkbox" value="empathy" /> Low empathy</label>
+                <label><input type="checkbox" value="workflow" /> Workflow miss</label>
+                <label><input type="checkbox" value="handoff" /> Missing handoff</label>
+              </fieldset>
+
+              <label class="notes-label" for="review-notes">Reviewer notes</label>
+              <textarea id="review-notes" rows="5"></textarea>
+
+              <div class="review-output">
+                <p class="panel-title">Current verdict</p>
+                <p id="verdict-copy"></p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="evals-view" role="tabpanel" aria-labelledby="evals-tab" hidden>
+          <div class="matrix-grid">
+            <section class="surface">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Regression Set</p>
+                  <h3>Healthcare agent eval matrix</h3>
+                </div>
+                <span class="status-pill strong">Synthetic test set</span>
+              </div>
+              <div class="eval-table-wrap">
+                <table class="eval-table">
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Workflow</th>
+                      <th>Risk</th>
+                      <th>Expected Behavior</th>
+                      <th>Assertions</th>
+                      <th>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="eval-table"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="surface">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Failure Analysis</p>
+                  <h3>What the evals are designed to catch</h3>
+                </div>
+              </div>
+              <div class="bars" id="bars"></div>
+              <div class="risk-register" id="risk-register"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="playbook-view" role="tabpanel" aria-labelledby="playbook-tab" hidden>
+          <div class="playbook-grid">
+            <section class="surface">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Case Study</p>
+                  <h3>How this maps to agent development</h3>
+                </div>
+              </div>
+              <div class="timeline">
+                <div>
+                  <span>01</span>
+                  <strong>Discover</strong>
+                  <p>Map customer workflow, patient/member intent, source systems, policy boundaries, and handoff thresholds.</p>
+                </div>
+                <div>
+                  <span>02</span>
+                  <strong>Design</strong>
+                  <p>Turn operational rules into answer patterns, grounding requirements, escalation language, and success criteria.</p>
+                </div>
+                <div>
+                  <span>03</span>
+                  <strong>Evaluate</strong>
+                  <p>Run scenario tests across accuracy, empathy, privacy, grounding, task completion, and refusal behavior.</p>
+                </div>
+                <div>
+                  <span>04</span>
+                  <strong>Operate</strong>
+                  <p>Review transcripts, tag failures, update playbooks, and monitor drift before expanding use cases.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="surface">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Launch Readiness</p>
+                  <h3>Controls a healthcare agent should have</h3>
+                </div>
+              </div>
+              <ul class="checklist" id="checklist"></ul>
+            </section>
+
+            <section class="surface wide">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Positioning</p>
+                  <h3>What this project is meant to prove</h3>
+                </div>
+              </div>
+              <div class="proof-grid">
+                <article>
+                  <strong>Healthcare workflow judgment</strong>
+                  <p>Benefits, billing, access, intake, and trial-navigation scenarios are represented as operational systems, not generic chatbot prompts.</p>
+                </article>
+                <article>
+                  <strong>Agent evaluation thinking</strong>
+                  <p>Rubrics, regression cases, failure tags, and reviewer notes show how the agent gets improved after launch.</p>
+                </article>
+                <article>
+                  <strong>Human oversight discipline</strong>
+                  <p>The interface makes uncertainty, source gaps, escalation, and PHI boundaries visible before a response is trusted.</p>
+                </article>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
