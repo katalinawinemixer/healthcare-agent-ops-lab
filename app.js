@@ -418,11 +418,27 @@ function defaultReview(item) {
   };
 }
 
+function normalizeReview(saved, defaults) {
+  if (!saved || typeof saved !== "object" || Array.isArray(saved)) return defaults;
+  const rubric = { ...defaults.rubric };
+  for (const key of Object.keys(rubric)) {
+    const value = saved.rubric?.[key];
+    if (Number.isInteger(value) && value >= 1 && value <= 5) rubric[key] = value;
+  }
+  const validTags = new Set(["ungrounded", "privacy", "empathy", "workflow", "handoff"]);
+  return {
+    decision: ["approve", "revise", "escalate"].includes(saved.decision) ? saved.decision : defaults.decision,
+    rubric,
+    tags: Array.isArray(saved.tags) ? [...new Set(saved.tags.filter((tag) => validTags.has(tag)))] : defaults.tags,
+    notes: typeof saved.notes === "string" ? saved.notes : defaults.notes,
+  };
+}
+
 const reviews = Object.fromEntries(cases.map((item) => [item.id, defaultReview(item)]));
 reviews[cases[0].id].notes = "Ready for pilot review if source links resolve and the plan document is current.";
 const persistedReviews = loadPersistedReviews();
 for (const [id, review] of Object.entries(persistedReviews)) {
-  if (reviews[id]) reviews[id] = { ...reviews[id], ...review };
+  if (Object.hasOwn(reviews, id)) reviews[id] = normalizeReview(review, reviews[id]);
 }
 
 let state = {
@@ -476,7 +492,8 @@ function sourceCoverage(item = currentCase()) {
 function loadPersistedReviews() {
   try {
     const raw = localStorage.getItem("healthcare-agent-ops-lab:reviews");
-    return raw ? JSON.parse(raw) : {};
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};
   }

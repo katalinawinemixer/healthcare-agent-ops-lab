@@ -65,7 +65,10 @@ to be portable into a larger React/Vite repo later if needed.
 
 ```bash
 node tests/static-evals.mjs
+node --test tests/review-state.test.mjs
 ```
+
+The review-state tests exercise saved-data recovery and approval policy.
 
 The static eval checks scenario count, evidence records for every displayed
 source, rubric bounds, synthetic identifier patterns, absence of hand-authored
